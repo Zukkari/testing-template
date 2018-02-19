@@ -269,7 +269,7 @@ public class ListTest {
 ```
 
 Mockito is black magic in its purest form.
-Only the mightiest Java wizards can hope to fully understand how it works internally.
+Only the mightiest of Java wizards can hope to fully understand how it works internally.
 Thankfully the documentation is pretty good and the test code is usually almost self explanatory.
 Using Mockito correctly can result in a very concise and readable test code.
 
@@ -279,21 +279,26 @@ Read the sample code in `src/main/java/sample`.
 Read the matching sample tests in `src/test/java/sample`.
 Then try to add tests for the classes in `src/main/java/task` as described below.
 
+The sample tests should contain all relevant JUnit and Mockito methods needed to complete the task.
+
 ### WeatherParserTest
 
 Create unit tests for the `WeatherParser` class.
 You'll need to change the class to make it testable.
-Extract the necessary parts, use dependency injection and mocks.
+Extract the necessary parts (as little as possible), use dependency injection and mocks.
+In this case you need to extract the cache file operations and downloading of the forecast.
 Don't use mockito for this task.
 
 Create at least the following tests:
 1. throwsExceptionIfTemperatureNotFoundForGivenDate
 2. findsCorrectTemperatureFromForecast
-3. correctForecastUsedIfGivenTimeEqualsStartOfForecast (edge case checks)
+3. forecastTimeRangeEndIsExcluded
 4. forecastIsLoadedFromCacheWhenQueryIsRepeated
 5. cacheIsNotModifiedWhenRequestedTemperatureIsNotFound
 
-If you get stuck then take another look at the sample tests.
+**Note**: `forecastTimeRangeEndIsExcluded` is an edge case check.
+The forecast format is `<time from=".." to="..">`, where `from` is when the forecast is first valid (inclusive) and `to` is when the forecast is no longer valid (exclusive).
+Test that `to` is exclusive, i.e. asking for a temperature at time `to` doesn't match the time range.
 
 ### AlarmClockTest
 
@@ -307,5 +312,3 @@ Create at least the following tests:
 4. scheduleAlarmSkipsScheduleIfTimeInPast
 5. startTickingThrowsExceptionWhenShutdown
 6. startTickingUsesDelayOf1Second
-
-If you get stuck then take another look at the sample tests.

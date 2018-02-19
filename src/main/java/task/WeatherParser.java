@@ -1,21 +1,22 @@
 package task;
 
 import org.apache.commons.io.IOUtils;
-import org.xml.sax.Attributes;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.Scanner;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -25,70 +26,83 @@ public class WeatherParser {
       "https://www.yr.no/place/Estonia/Tartumaa/Tartu/forecast.xml";
 
   public int temperatureAt(LocalDateTime time) throws Exception {
+    // caching - storing the results of some expensive calculation so
+    // that it can be reused later. the WeatherParser stores all already
+    // requested temperatures into a file. if the file already contains the
+    // temperature, then downloading the latest forecast is skipped.
+
     Integer cached = findCachedTemperature(time);
     if (cached != null)
       return cached;
 
-    TemperatureFindingHandler handler = new TemperatureFindingHandler(time);
+    // download the latest forecast from yr.no weather service
+    String forecastXml;
+    try (InputStream stream = new URL(FORECAST_LOCATION).openStream()) {
+      forecastXml = IOUtils.toString(stream, UTF_8);
+    }
 
-    // SAXParser walks through the xml and calls TemperatureFindingHandler#startElement for
-    // every opening tag in the xml, e.g. for <time>, but not for </time>
-    SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-    String xml = IOUtils.toString(new URL(FORECAST_LOCATION), UTF_8);
-    parser.parse(new InputSource(new StringReader(xml)), handler);
+    // try to find the requested temperature from the downloaded forecast
+    Integer result = findTemperatureFromXml(time, forecastXml);
 
-    if (handler.temperature == null)
-      throw new IllegalStateException("not found");
+    // write the result to cache so we can reuse it
+    writeResultToCache(time, result);
 
-    writeResultToCache(time, handler.temperature);
+    return result;
+  }
 
-    return handler.temperature;
+  private Integer findTemperatureFromXml(LocalDateTime time, String xml) throws Exception {
+    // uses the xml parser built into java so we can skip a bunch of string processing
+    DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    Document parsedXml = builder.parse(new InputSource(new StringReader(xml)));
+    NodeList timeElementList = parsedXml.getElementsByTagName("time");
+    for (int i = 0; i < timeElementList.getLength(); i++) {
+      Node timeElement = timeElementList.item(i);
+      // example: <time from="2018-02-11T22:00:00" to="2018-02-12T00:00:00" period="3">
+      LocalDateTime from = LocalDateTime.parse(getAttributeValue(timeElement, "from"));
+      LocalDateTime to = LocalDateTime.parse(getAttributeValue(timeElement, "to"));
+      if (time.compareTo(from) >= 0 && time.compareTo(to) < 0) {
+        NodeList childNodes = timeElement.getChildNodes();
+        for (int j = 0; j < childNodes.getLength(); j++) {
+          Node child = childNodes.item(j);
+          if ("temperature".equals(child.getNodeName())) {
+            // example: <temperature unit="celsius" value="-3" />
+            return Integer.parseInt(getAttributeValue(child, "value"));
+          }
+        }
+      }
+    }
+    throw new IllegalStateException("temperature not found");
+  }
+
+  private String getAttributeValue(Node element, String attributeName) {
+    return element.getAttributes().getNamedItem(attributeName).getTextContent();
   }
 
   private Integer findCachedTemperature(LocalDateTime time) throws IOException {
-    String timeAsString = time.toString();
+    String requestedTime = time.toString();
 
-    List<String> lines = Files.readAllLines(Paths.get("cache.txt"));
-    for (String line : lines) {
-      String[] parts = line.split(" ");
-      if (parts.length == 2 && parts[0].equals(timeAsString))
-        return Integer.parseInt(parts[1]);
+    Path cacheFile = Paths.get("cache.txt");
+    String cache = Files.isRegularFile(cacheFile)
+        ? new String(Files.readAllBytes(cacheFile), UTF_8)
+        : "";
+
+    // file format: datetime temperature datetime temperature datetime temperature ...
+    Scanner scanner = new Scanner(cache);
+    while (scanner.hasNext()) {
+      String cachedTime = scanner.next();
+      int cachedTemperature = scanner.nextInt();
+      if (cachedTime.equals(requestedTime))
+        return cachedTemperature;
     }
     return null;
   }
 
   private void writeResultToCache(LocalDateTime time, int temperature) throws IOException {
-    Files.write(
-        Paths.get("cache.txt"),
-        Collections.singleton(
-            time.toString() + " " + temperature
-        ),
-        StandardOpenOption.APPEND
-    );
-  }
-
-  private static class TemperatureFindingHandler extends DefaultHandler {
-
-    final LocalDateTime target;
-    boolean inMatchingForecast = false;
-    Integer temperature;
-
-    TemperatureFindingHandler(LocalDateTime target) {
-      this.target = target;
-    }
-
-    @Override
-    public void startElement(String uri, String localName, String qName, Attributes attributes) {
-      if ("time".equals(qName)) {
-        // <time from="2018-02-11T22:00:00" to="2018-02-12T00:00:00" period="3">
-        LocalDateTime from = LocalDateTime.parse(attributes.getValue("from"));
-        LocalDateTime to = LocalDateTime.parse(attributes.getValue("to"));
-        inMatchingForecast = target.compareTo(from) >= 0 && target.compareTo(to) < 0;
-      }
-      if ("temperature".equals(qName) && inMatchingForecast) {
-        // <temperature unit="celsius" value="-3" />
-        temperature = Integer.parseInt(attributes.getValue("value"));
-      }
-    }
+    Path cacheFile = Paths.get("cache.txt");
+    String cache = Files.isRegularFile(cacheFile)
+        ? new String(Files.readAllBytes(cacheFile), UTF_8)
+        : "";
+    cache += " " + time.toString() + " " + temperature;
+    Files.write(cacheFile, cache.getBytes(UTF_8));
   }
 }
