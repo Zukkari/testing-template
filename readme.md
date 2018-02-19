@@ -285,8 +285,8 @@ The sample tests should contain all relevant JUnit and Mockito methods needed to
 
 Create unit tests for the `WeatherParser` class.
 You'll need to change the class to make it testable.
-Extract the necessary parts (as little as possible), use dependency injection and mocks.
-In this case you need to extract the cache file operations and downloading of the forecast.
+Extract the cache file operations and downloading of the forecast.
+Use dependency injection and mocks to ensure the tests don't read/write any files and not download anything from the actual yr.no weather service.
 Don't use mockito for this task.
 
 Create at least the following tests:
