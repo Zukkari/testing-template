@@ -18,5 +18,10 @@ public class AlarmClockTest {
     assertTrue(c.call());
   }
 
+  // Many ScheduledExecutorService methods return a ScheduledFuture<T>.
+  // Your mock can return a mock ScheduledFuture or null:
+  // A) when(executor.something()).thenReturn(mock(ScheduledFuture.class));
+  // B) when(executor.something()).thenReturn(null);
+
   // TODO add your tests here
 }
