@@ -106,7 +106,7 @@ class Untestable {
 }
 ```
 
-We want to test the logic for processing the data from the database, but not the actual loading of the data (handled by the `DatabaseConnection` class).
+We want to test the logic for processing the data from the database, but avoid accessing an actual database (done in the `readData` method).
 Setting up a database, cleaning it up etc is slow, complicated and out of scope for our test.
 
 The solution is two part:
@@ -284,9 +284,9 @@ The sample tests should contain all relevant JUnit and Mockito methods needed to
 ### WeatherParserTest
 
 Create unit tests for the `WeatherParser` class.
-You'll need to change the class to make it testable.
+You'll first need to change the `WeatherParser` class to make it testable.
 Extract the cache file operations and downloading of the forecast.
-Use dependency injection and mocks to ensure the tests don't read/write any files and not download anything from the actual yr.no weather service.
+Use dependency injection and mocks to ensure the tests don't read/write any files and not download anything from the actual *yr.no* weather service.
 Don't use mockito for this task.
 
 Create at least the following tests:
