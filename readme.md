@@ -262,6 +262,7 @@ public class ListTest {
   public void mockSize() {
     // java.util.List is an interface with more than 10 methods
     List<Object> list = mock(List.class);
+    // when size() is called on the mock object, then it should return 0
     when(list.size()).thenReturn(0);
     assertEquals(0, list.size());
   }
@@ -285,20 +286,28 @@ The sample tests should contain all relevant JUnit and Mockito methods needed to
 
 Create unit tests for the `WeatherParser` class.
 You'll first need to change the `WeatherParser` class to make it testable.
-Extract the cache file operations and downloading of the forecast.
-Use dependency injection and mocks to ensure the tests don't read/write any files and not download anything from the actual *yr.no* weather service.
+Extract the code for downloading the forecast.
+Use dependency injection and mocks to ensure the tests don't download anything from the actual *yr.no* weather service.
+The local `forecast.xml` in src/test/resources should be used instead.
 Don't use mockito for this task.
 
 Create at least the following tests:
-1. throwsExceptionIfTemperatureNotFoundForGivenDate
-2. findsCorrectTemperatureFromForecast
-3. forecastTimeRangeEndIsExcluded
-4. forecastIsLoadedFromCacheWhenQueryIsRepeated
-5. cacheIsNotModifiedWhenRequestedTemperatureIsNotFound
+1. findsCorrectTemperatureFromForecast
+2. throwsExceptionIfTemperatureNotFoundForGivenDate
 
-**Note**: `forecastTimeRangeEndIsExcluded` is an edge case check.
-The forecast format is `<time from=".." to="..">`, where `from` is when the forecast is first valid (inclusive) and `to` is when the forecast is no longer valid (exclusive).
-Test that `to` is exclusive, i.e. asking for a temperature at time `to` doesn't match the time range.
+### CachedWeatherParserTest
+
+Create unit tests for the `CachedWeatherParser` class.
+Make the class more easily testable by mocking the file system operations.
+The `weather-store.txt` should not be touched in the tests.
+Instead, create a mock that can store the values in-memory (in a simple field).
+The `WeatherParser` used by the `CachedWeatherParser` should be mocked as well.
+Don't use mockito for this task.
+
+Create at least the following tests:
+1. loadsTemperatureFromWeatherParserWhenStoredValueNotFound
+2. valueFromWeatherParserIsStored
+3. skipsUsingWeatherParserWhenStoredValueFound
 
 ### AlarmClockTest
 

@@ -1,6 +1,5 @@
 package task;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.IOException;
