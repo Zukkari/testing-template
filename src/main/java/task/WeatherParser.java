@@ -28,10 +28,10 @@ public class WeatherParser {
     Document document = DocumentHelper.parseText(forecastXml);
     List<Node> timeElements = document.selectNodes("//weatherdata/forecast/tabular/time");
     for (Node timeElement : timeElements) {
-      LocalDateTime from = LocalDateTime.parse(timeElement.selectSingleNode("//@from").getText());
-      LocalDateTime to = LocalDateTime.parse(timeElement.selectSingleNode("//@to").getText());
+      LocalDateTime from = LocalDateTime.parse(timeElement.selectSingleNode("@from").getText());
+      LocalDateTime to = LocalDateTime.parse(timeElement.selectSingleNode("@to").getText());
       if (time.compareTo(from) >= 0 && time.compareTo(to) < 0) {
-        return Integer.parseInt(timeElement.selectSingleNode("//temperature/@value").getText());
+        return Integer.parseInt(timeElement.selectSingleNode("temperature/@value").getText());
       }
     }
     throw new IllegalStateException("temperature not found");
