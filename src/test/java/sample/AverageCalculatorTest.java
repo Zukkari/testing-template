@@ -2,6 +2,8 @@ package sample;
 
 import org.junit.Test;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 
 public class AverageCalculatorTest {
@@ -11,21 +13,21 @@ public class AverageCalculatorTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void failsIfNoValuesAreProvided() {
-    calc.averageOf();
+    calc.averageOf(emptyList());
   }
 
   @Test
   public void singleValueIsAverageOfSelf() {
-    assertEquals(1, calc.averageOf(1), MAX_ROUNDING_ERROR);
+    assertEquals(1, calc.averageOf(asList(1.0)), MAX_ROUNDING_ERROR);
   }
 
   @Test
   public void positiveNumbersAverageIsCorrect() {
-    assertEquals(2, calc.averageOf(1, 2, 3), MAX_ROUNDING_ERROR);
+    assertEquals(2, calc.averageOf(asList(1.0, 2.0, 3.0)), MAX_ROUNDING_ERROR);
   }
 
   @Test
   public void negativeNumbersAverageIsCorrect() {
-    assertEquals(-2, calc.averageOf(-1, -2, -3), MAX_ROUNDING_ERROR);
+    assertEquals(-2, calc.averageOf(asList(-1.0, -2.0, -3.0)), MAX_ROUNDING_ERROR);
   }
 }

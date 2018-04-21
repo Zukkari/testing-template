@@ -1,14 +1,16 @@
 package sample;
 
+import java.util.List;
+
 public class AverageCalculator {
 
-  double averageOf(double... values) {
-    if (values == null || values.length == 0)
+  double averageOf(List<Double> values) {
+    if (values == null || values.isEmpty())
       throw new IllegalArgumentException("no values provided");
 
     double sum = 0;
     for (double value : values)
       sum += value;
-    return sum / values.length;
+    return sum / values.size();
   }
 }
