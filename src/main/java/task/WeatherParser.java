@@ -4,25 +4,19 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 public class WeatherParser {
 
-  private static final String FORECAST_LOCATION =
-      "https://www.yr.no/place/Estonia/Tartumaa/Tartu/forecast.xml";
+  private final ForecastDownloader downloader;
+
+  public WeatherParser(ForecastDownloader downloader) {
+    this.downloader = downloader;
+  }
 
   public int temperatureAt(LocalDateTime time) throws Exception {
-    // download the latest forecast from yr.no weather service
-    String forecastXml;
-    try (InputStream stream = new URL(FORECAST_LOCATION).openStream()) {
-      forecastXml = IOUtils.toString(stream, UTF_8);
-    }
-
+    String forecastXml = downloader.getForecastXml();
     // try to find the requested temperature from the downloaded forecast
     // look at the sample xml at src/test/resources/forecast.xml to understand selectNodes()
     Document document = DocumentHelper.parseText(forecastXml);

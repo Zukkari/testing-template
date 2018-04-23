@@ -5,30 +5,33 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class TodoApp {
 
+  private final TodoStore store;
+
+  public TodoApp(TodoStore store) {
+    this.store = store;
+  }
+
   public Set<String> getTodoList() throws IOException {
-    return Collections.unmodifiableSet(fromBytes(readStoredValues()));
+    return Collections.unmodifiableSet(fromBytes(store.readStoredValues()));
   }
 
   public void addTodoItem(String item) throws IOException {
-    Set<String> todos = fromBytes(readStoredValues());
+    Set<String> todos = fromBytes(store.readStoredValues());
     if (todos.add(item)) {
-      writeValuesToStore(toBytes(todos));
+      store.writeValuesToStore(toBytes(todos));
     }
   }
 
   public void removeTodoItem(String item) throws IOException {
-    Set<String> todos = fromBytes(readStoredValues());
+    Set<String> todos = fromBytes(store.readStoredValues());
     if (todos.remove(item)) {
-      writeValuesToStore(toBytes(todos));
+      store.writeValuesToStore(toBytes(todos));
     }
   }
 
@@ -52,16 +55,5 @@ public class TodoApp {
       }
     }
     return todos;
-  }
-
-  private byte[] readStoredValues() throws IOException {
-    Path path = Paths.get("todo.bin");
-    if (!Files.isRegularFile(path))
-      return null;
-    return Files.readAllBytes(path);
-  }
-
-  private void writeValuesToStore(byte[] values) throws IOException {
-    Files.write(Paths.get("todo.bin"), values);
   }
 }
