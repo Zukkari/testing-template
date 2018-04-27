@@ -308,20 +308,19 @@ Create at least the following tests:
 1. findsCorrectTemperatureFromForecast
 2. throwsExceptionIfTemperatureNotFoundForGivenDate
 
-### CachedWeatherParserTest
+### TodoAppTest
 
-Create unit tests for the `CachedWeatherParser` class.
+Create unit tests for the `TodoApp` class.
 Make the class more easily testable by mocking the file system operations.
-The `weather-store.txt` should not be touched in the tests.
+The `todo.bin` file should not be touched in the tests.
 Instead, create a mock that can store the values in-memory (in a simple field).
-The `WeatherParser` used by the `CachedWeatherParser` should be mocked as well.
 
 Don't use mockito for this task.
 
 Create at least the following tests:
-1. loadsTemperatureFromWeatherParserWhenStoredValueNotFound
-2. valueFromWeatherParserIsStored
-3. skipsUsingWeatherParserWhenStoredValueFound
+1. itemIsInListAfterBeingAdded
+2. itemNotInListAfterBeingRemoved
+3. addingDuplicateItemDoesNotChangeStoredData
 
 ### AlarmClockTest
 

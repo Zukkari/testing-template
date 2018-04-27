@@ -1,6 +1,6 @@
 package task;
 
-public class CachedWeatherParserTest {
+public class TodoAppTest {
 
   // TODO add your tests here
 
