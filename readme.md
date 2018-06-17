@@ -322,15 +322,12 @@ Create at least the following tests:
 2. itemNotInListAfterBeingRemoved
 3. addingDuplicateItemDoesNotChangeStoredData
 
-### AlarmClockTest
+### TicketOfficeTest
 
-Create unit tests for the `AlarmClock` class.
-Use Mockito to mock the `ScheduledExecutorService` interface.
+Create unit tests for the `TicketOffice` class.
+Use Mockito to mock the `TicketDatabase` interface.
 
 Create at least the following tests:
-1. timerAlarmCallsScheduleExactlyOnce
-2. timerAlarmUsesCorrectDelay
-3. scheduleAlarmCallsScheduleIfTimeInFuture
-4. scheduleAlarmSkipsScheduleIfTimeInPast
-5. startTickingThrowsExceptionWhenShutdown
-6. startTickingUsesDelayOf1Second
+1. throwsExceptionWhenNoSeatsAvailable
+2. returnsAvailableSeatOnPurchase
+3. callsReserveSeatWithCorrectArguments
