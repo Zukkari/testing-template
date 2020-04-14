@@ -30,7 +30,7 @@ In projects with maven project structure, the tests are usually placed in `src/t
 Running `mvn test` will run all tests immediately.
 You can also start the tests from your IDE by right clicking on the test and selecting `Run`.
 
-## JUnit 4
+## JUnit 5
 
 One popular testing framework in Java is JUnit.
 JUnit provides a way to run setup/teardown code before/after each test.
@@ -47,22 +47,34 @@ Most tests have the following structure:
 
 **src/test/java/SampleTest.java**
 ```java
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SampleTest {
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // JUnit runs this method before each test
   }
+  
+  @BeforeAll
+  public static void beforeAll() {
+      // JUnit runs this method before all tests
+  }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     // JUnit runs this method after each test
+  }
+
+  @AfterAll
+  public static void teardownAll() {
+      // JUnit runs this method after all tests
   }
 
   @Test
