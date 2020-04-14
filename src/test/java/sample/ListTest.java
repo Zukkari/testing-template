@@ -1,10 +1,10 @@
 package sample;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
@@ -13,13 +13,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("unchecked")
 public class ListTest {
-  
+
   @Test
   public void mockReturnValuesOfMethods() {
     // create a mock object that implements List
-    List<Object> list = mock(List.class);
+    List<?> list = mock(List.class);
     // program the mock object:
     // when size() is called on the mock, then the mock should return 0
     when(list.size()).thenReturn(0);

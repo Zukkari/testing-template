@@ -1,10 +1,11 @@
 package sample;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserFinderTest {
 
@@ -26,10 +27,12 @@ public class UserFinderTest {
     assertEquals("Simmo Saan", name);
   }
 
-  @Test(expected = NoSuchElementException.class)
-  public void failsOnUnknownUser() throws Exception {
-    UserFinder finder = new UserFinder(new TestUserStore(SAMPLE_NORMAL));
-    finder.findFullNameByUsername("ivaat");
+  @Test
+  public void failsOnUnknownUser() {
+    assertThrows(NoSuchElementException.class, () -> {
+      UserFinder finder = new UserFinder(new TestUserStore(SAMPLE_NORMAL));
+      finder.findFullNameByUsername("ivaat");
+    });
   }
 
   @Test
